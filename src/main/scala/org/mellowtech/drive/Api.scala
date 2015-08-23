@@ -1,4 +1,6 @@
-package org.mellowtech.sdrive
+package org.mellowtech.drive
+
+import com.google.api.client.http.FileContent
 
 import scala.util.{Try, Failure, Success}
 import scala.concurrent._
@@ -15,6 +17,7 @@ class GDrive(var token: String, val refreshToken: Option[String], val clientId: 
   import com.google.api.client.json.jackson2.JacksonFactory
   import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
   import com.google.api.services.drive.Drive
+
   val httpTransport = new NetHttpTransport
   val jsonFactory = new JacksonFactory
   
@@ -49,7 +52,7 @@ class GDrive(var token: String, val refreshToken: Option[String], val clientId: 
   val about = try {
     drive.about.get.execute
   } catch {case e: Exception =>
-    refresh match {
+    refresh() match {
       case Success(_) => drive.about.get.execute
       case Failure(e) => throw new Error("could not initialize drive")
     }
@@ -77,6 +80,7 @@ object GApi extends LazyLogging{
   private def withRetry[T](f: => T)(implicit d: GDrive): Try[T] = try {
     Success(f)
   }catch {case e: Exception =>
+    //e.printStackTrace(System.out)
     d.refresh match {
       case Failure(fail) => Failure(fail)
       case Success(_) => try {
@@ -85,9 +89,16 @@ object GApi extends LazyLogging{
     }
   }
   
-  def asyncRetry[T](f: => T)(implicit d: GDrive): Future[Try[T]] = scala.concurrent.Future(withRetry(f))(d.ec)
+  def asyncRetry[T](f: => T)(implicit d: GDrive): Future[T] =
+    Future(withRetry(f))(d.ec).flatMap{
+      case Success(t: T) => Future.successful(t)
+      case Failure(e) => Future.failed(e)
+    }(d.ec)
   
-  def async[T](f: => T)(implicit d: GDrive): Future[T] = scala.concurrent.Future(f)(d.ec)
+  def async[T](f: => T)(implicit d: GDrive): Future[T] = Future(f)(d.ec).flatMap{
+    case Success(t: T) => Future.successful(t)
+    case Failure(e) => Future.failed(e)
+  }(d.ec)
   
   def file(id: String)(implicit d: GDrive): SFile = {
     val t1 = System.currentTimeMillis()
@@ -103,7 +114,7 @@ object GApi extends LazyLogging{
       val files = r.execute
       res ++= files.getItems.asScala.map(asSFile(_))
       r.setPageToken(files.getNextPageToken)
-    } while (r.getPageToken() != null && r.getPageToken().length() > 0)
+    } while (r.getPageToken != null && r.getPageToken.length() > 0)
     res
   }
   /**
@@ -144,8 +155,8 @@ def files(implicit d: GDrive): Seq[SFile] = files(d.files.list)
         println("got some childrien "+children.size)
         res ++= children.getItems.asScala.map(asSChildReference(_))
         r.setPageToken(children.getNextPageToken)
-    } while (r.getPageToken() != null &&
-             r.getPageToken().length() > 0);
+    } while (r.getPageToken != null &&
+             r.getPageToken.length() > 0);
     res
   }
   
@@ -162,13 +173,21 @@ def files(implicit d: GDrive): Seq[SFile] = files(d.files.list)
     val ff = d.files.insert(f).execute()
     ff.getId
   }
-  
-  
-  
-  
- 
-  
-  
-  
-  
+
+  def uploadfile(name: String, parentId: Option[String], mimeType: String, convert: Boolean = false, localFile: String)(implicit d: GDrive): String = {
+    val f: File = new File
+    f.setMimeType(mimeType)
+    f.setTitle(name)
+    if(parentId != None) f.setParents(List(new ParentReference().setId(parentId.get)).asJava)
+    val fileContent = new java.io.File(localFile)
+    val mediaContent = new FileContent(mimeType, fileContent);
+    val ff = d.files.insert(f).setConvert(convert).execute()
+    ff.getId
+  }
+
+  def rm(id: String)(implicit d: GDrive): Unit = {
+    println("deleting file: "+id)
+    d.files.delete(id).execute()
+  }
+
 }

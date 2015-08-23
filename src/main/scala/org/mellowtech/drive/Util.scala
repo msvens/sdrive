@@ -1,4 +1,4 @@
-package org.mellowtech.sdrive
+package org.mellowtech.drive
 
 /**
  * @author msvens

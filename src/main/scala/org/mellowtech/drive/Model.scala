@@ -1,62 +1,6 @@
-package org.mellowtech.sdrive
+package org.mellowtech.drive
 
-import com.google.api.client.util.DateTime
-
-/**
- * @author msvens
- */
-case class SFile(
-  alternateLink: Option[String] = None,
-  appContent: Option[Boolean] = None,
-  copyable: Option[Boolean] = None,
-  createDate: Option[DateTime] = None,
-  defaultOpen: Option[String] = None,
-  description: Option[String] = None,
-  downloadUrl: Option[String] = None,
-  editable: Option[Boolean] = None,
-  embedLink: Option[String] = None,
-  eTag: Option[String] = None,
-  explicitTrash: Option[Boolean] = None,
-  exportLinks: Option[Map[String, String]] = None,
-  fileExtension: Option[String] = None,
-  fileSize: Option[Long] = None,
-  folderColor: Option[String] = None,
-  headRevisionId: Option[String] = None,
-  iconLink: Option[String] = None,
-  id: Option[String] = None,
-  imageMediaMetadata: Option[SImageMediaMetadata] = None,
-  indexableText: Option[SIndexableText] = None,
-  kind: Option[String] = None,
-  labels: Option[SLabels] = None,
-  lastModifyingUser: Option[SUser] = None,
-  lastModifyingUserName: Option[String] = None,
-  lastViewedByMeDate: Option[DateTime] = None,
-  markedViewedByMeDate: Option[DateTime] = None,
-  md5CheckSum: Option[String] = None,
-  mimeType: Option[String] = None,
-  modifiedByMeDate: Option[DateTime] = None,
-  modifiedDate: Option[DateTime] = None,
-  openWithLinks: Option[Map[String, String]] = None,
-  originalFileName: Option[String] = None,
-  ownerNames: Option[Seq[String]] = None,
-  owners: Option[Seq[SUser]] = None,
-  parents: Option[Seq[SParentReference]] = None,
-  permissions: Option[Seq[SPermission]] = None,
-  properties: Option[Seq[SProperty]] = None,
-  quotaBytesUsed: Option[Long] = None,
-  selfLink: Option[String] = None,
-  shared: Option[Boolean] = None,
-  sharedWithMeDate: Option[DateTime] = None,
-  thumbnail: Option[SThumbnail] = None,
-  sharingUser: Option[SUser] = None,
-  thumbnailLink: Option[String] = None,
-  title: Option[String] = None,
-  userPermission: Option[SPermission] = None,
-  version: Option[Long] = None,
-  videoMediaMetadata: Option[SVideoMediaMetadata] = None,
-  webContentLink: Option[String] = None,
-  webViewLink: Option[String] = None,
-  writersCanShare: Option[Boolean] = None)
+//import com.google.api.client.util.DateTime
 
 case class SThumbnail(
   decodeImage: Option[Array[Byte]] = None, image: Option[String] = None, mimeType: Option[String] = None)
@@ -95,11 +39,70 @@ case class SImageMediaMetadata(
   sensor: Option[String] = None, subjectDistance: Option[Int] = None,
   whiteBalance: Option[String] = None, width: Option[Int] = None)
 
+
 case class SVideoMediaMetadata(durationMillis: Option[Long] = None, height: Option[Int] = None, width: Option[Int] = None)
 
 case class SChildReference(
     childLink: Option[String] = None, id: Option[String] = None, kind: Option[String] = None, selfLink: Option[String] = None
 )
+
+/**
+ * @author msvens
+ */
+case class SFile(
+                  alternateLink: Option[String] = None,
+                  appContent: Option[Boolean] = None,
+                  copyable: Option[Boolean] = None,
+                  createDate: Option[String] = None,
+                  defaultOpen: Option[String] = None,
+                  description: Option[String] = None,
+                  downloadUrl: Option[String] = None,
+                  editable: Option[Boolean] = None,
+                  embedLink: Option[String] = None,
+                  eTag: Option[String] = None,
+                  explicitTrash: Option[Boolean] = None,
+                  exportLinks: Option[Map[String, String]] = None,
+                  fileExtension: Option[String] = None,
+                  fileSize: Option[Long] = None,
+                  folderColor: Option[String] = None,
+                  headRevisionId: Option[String] = None,
+                  iconLink: Option[String] = None,
+                  id: Option[String] = None,
+                  imageMediaMetadata: Option[SImageMediaMetadata] = None,
+                  indexableText: Option[SIndexableText] = None,
+                  kind: Option[String] = None,
+                  labels: Option[SLabels] = None,
+                  lastModifyingUser: Option[SUser] = None,
+                  lastModifyingUserName: Option[String] = None,
+                  lastViewedByMeDate: Option[String] = None,
+                  markedViewedByMeDate: Option[String] = None,
+                  md5CheckSum: Option[String] = None,
+                  mimeType: Option[String] = None,
+                  modifiedByMeDate: Option[String] = None,
+                  modifiedDate: Option[String] = None,
+                  openWithLinks: Option[Map[String, String]] = None,
+                  originalFileName: Option[String] = None,
+                  ownerNames: Option[Seq[String]] = None,
+                  owners: Option[Seq[SUser]] = None,
+                  parents: Option[Seq[SParentReference]] = None,
+                  permissions: Option[Seq[SPermission]] = None,
+                  properties: Option[Seq[SProperty]] = None,
+                  quotaBytesUsed: Option[Long] = None,
+                  selfLink: Option[String] = None,
+                  shared: Option[Boolean] = None,
+                  sharedWithMeDate: Option[String] = None,
+                  thumbnail: Option[SThumbnail] = None,
+                  sharingUser: Option[SUser] = None,
+                  thumbnailLink: Option[String] = None,
+                  title: Option[String] = None,
+                  userPermission: Option[SPermission] = None,
+                  version: Option[Long] = None,
+                  videoMediaMetadata: Option[SVideoMediaMetadata] = None,
+                  webContentLink: Option[String] = None,
+                  webViewLink: Option[String] = None,
+                  writersCanShare: Option[Boolean] = None
+                  )
+
 
 object ModelConversions {
   import com.google.api.services.drive.model._
@@ -170,7 +173,7 @@ object ModelConversions {
       alternateLink = Option(f.getAlternateLink),
       appContent = if(f.getAppDataContents == null) None else Some(f.getAppDataContents),
       copyable = if(f.getCopyable == null) None else Some(f.getCopyable),
-      createDate = Option(f.getCreatedDate),
+      createDate = if(f.getCreatedDate == null) None else Some(f.getCreatedDate.toStringRfc3339),
       defaultOpen = Option(f.getDefaultOpenWithLink),
       description = Option(f.getDescription),
       downloadUrl = Option(f.getDownloadUrl),
@@ -191,12 +194,12 @@ object ModelConversions {
       labels = if(f.getLabels == null) None else Some(f.getLabels),
       lastModifyingUser = if(f.getLastModifyingUser == null) None else Some(f.getLastModifyingUser),
       lastModifyingUserName = Option(f.getLastModifyingUserName),
-      lastViewedByMeDate = Option(f.getLastViewedByMeDate),
-      markedViewedByMeDate = Option(f.getMarkedViewedByMeDate),
+      lastViewedByMeDate = if(f.getLastViewedByMeDate == null) None else Some(f.getLastViewedByMeDate.toStringRfc3339),
+      markedViewedByMeDate = if(f.getMarkedViewedByMeDate == null) None else Some(f.getMarkedViewedByMeDate.toStringRfc3339),
       md5CheckSum = Option(f.getMd5Checksum),
       mimeType = Option(f.getMimeType),
-      modifiedByMeDate = Option(f.getModifiedByMeDate),
-      modifiedDate = Option(f.getModifiedDate),
+      modifiedByMeDate = if(f.getModifiedByMeDate == null) None else Some(f.getModifiedByMeDate.toStringRfc3339),
+      modifiedDate = if(f.getModifiedDate == null) None else Some(f.getModifiedDate.toStringRfc3339),
       openWithLinks = if (f.getOpenWithLinks == null) None else Some(f.getOpenWithLinks.asScala.toMap),
       originalFileName = Option(f.getOriginalFilename),
       ownerNames = if (f.getOwnerNames == null) None else Some(f.getOwnerNames.asScala),
@@ -207,7 +210,7 @@ object ModelConversions {
       quotaBytesUsed = if(f.getQuotaBytesUsed == null) None else Some(f.getQuotaBytesUsed),
       selfLink = Option(f.getSelfLink),
       shared = if(f.getShared == null) None else Some(f.getShared),
-      sharedWithMeDate = Option(f.getSharedWithMeDate),
+      sharedWithMeDate = if(f.getSharedWithMeDate == null) None else Some(f.getSharedWithMeDate.toStringRfc3339),
       sharingUser = if(f.getSharingUser == null) None else Some(f.getSharingUser),
       thumbnail = if(f.getThumbnail == null) None else Some(f.getThumbnail),
       thumbnailLink = Option(f.getThumbnailLink),
@@ -217,7 +220,8 @@ object ModelConversions {
       videoMediaMetadata = if(f.getVideoMediaMetadata == null) None else Some(f.getVideoMediaMetadata),
       webContentLink = Option(f.getWebContentLink),
       webViewLink = Option(f.getWebViewLink),
-      writersCanShare = if(f.getWritersCanShare == null) None else Some(f.getWritersCanShare))
+      writersCanShare = if(f.getWritersCanShare == null) None else Some(f.getWritersCanShare)
+    )
   }
 
 }
