@@ -1,4 +1,4 @@
-package org.mellowtech.drive
+package org.mellowtech.gapi.model
 
 //import com.google.api.client.util.DateTime
 
@@ -106,6 +106,7 @@ case class SFile(
 
 object ModelConversions {
   import com.google.api.services.drive.model._
+
   import scala.collection.JavaConverters._
   
   implicit def asSChildReference(cr: ChildReference) = SChildReference(
